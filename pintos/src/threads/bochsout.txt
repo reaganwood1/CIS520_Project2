@@ -29,13 +29,13 @@
 00000000000i[     ]   SB16 support: no
 00000000000i[     ]   USB support: no
 00000000000i[     ]   VGA extension support: vbe 
-00000000000i[MEM0 ] allocated memory at 0x7fe0026ac010. after alignment, vector=0x7fe0026ad000
+00000000000i[MEM0 ] allocated memory at 0xb6919008. after alignment, vector=0xb691a000
 00000000000i[MEM0 ] 4.00MB
 00000000000i[MEM0 ] mem block size = 0x00100000, blocks=4
-00000000000i[MEM0 ] rom at 0xfffe0000/131072 ('/home/r/reaganwood1/CIS520/usr/local/share/bochs/BIOS-bochs-latest')
-00000000000i[MEM0 ] rom at 0xc0000/40448 ('/home/r/reaganwood1/CIS520/usr/local/share/bochs/VGABIOS-lgpl-latest')
+00000000000i[MEM0 ] rom at 0xfffe0000/131072 ('/root/cis520/usr/local/share/bochs/BIOS-bochs-latest')
+00000000000i[MEM0 ] rom at 0xc0000/40448 ('/root/cis520/usr/local/share/bochs/VGABIOS-lgpl-latest')
 00000000000i[CMOS ] Using specified time for initial clock
-00000000000i[CMOS ] Setting initial clock to: Wed Dec 31 18:00:00 1969 (time0=0)
+00000000000i[CMOS ] Setting initial clock to: Wed Dec 31 19:00:00 1969 (time0=0)
 00000000000i[DMA  ] channel 4 used by cascade
 00000000000i[DMA  ] channel 2 used by Floppy Drive
 00000000000i[VGA  ] interval=50000
@@ -45,8 +45,7 @@
 00000000000i[     ] init_dev of 'unmapped' plugin device by virtual method
 00000000000i[     ] init_dev of 'biosdev' plugin device by virtual method
 00000000000i[     ] init_dev of 'speaker' plugin device by virtual method
-00000000000i[SPEAK] Failed to open /dev/console: Permission denied
-00000000000i[SPEAK] Deactivating beep on console
+00000000000i[SPEAK] Open /dev/console successfully
 00000000000i[     ] init_dev of 'extfpuirq' plugin device by virtual method
 00000000000i[     ] init_dev of 'ioapic' plugin device by virtual method
 00000000000i[IOAP ] initializing I/O APIC
@@ -54,7 +53,7 @@
 00000000000i[     ] init_dev of 'keyboard' plugin device by virtual method
 00000000000i[KBD  ] will paste characters every 1000 keyboard ticks
 00000000000i[     ] init_dev of 'harddrv' plugin device by virtual method
-00000000000i[HD   ] HD on ata0-0: '/tmp/2n4zJvHSZ7.dsk' 'flat' mode 
+00000000000i[HD   ] HD on ata0-0: '/tmp/e4s7RH4vTQ.dsk' 'flat' mode 
 00000000000i[HD   ] Using boot sequence disk, none, none
 00000000000i[HD   ] Floppy boot signature check is enabled
 00000000000i[     ] init_dev of 'serial' plugin device by virtual method
@@ -108,26 +107,26 @@
 00000814248i[BIOS ] ata0-0: PCHS=1/16/63 translation=none LCHS=1/16/63
 00004695695i[BIOS ] IDE time out
 00007718729i[BIOS ] Booting from 0000:7c00
-00423053476p[     ] >>PANIC<< SIGNAL 2 caught
-00423053476i[CPU0 ] CPU is in protected mode (halted)
-00423053476i[CPU0 ] CS.d_b = 32 bit
-00423053476i[CPU0 ] SS.d_b = 32 bit
-00423053476i[CPU0 ] | EAX=00000000  EBX=c00381a0  ECX=c0103000  EDX=00000018
-00423053476i[CPU0 ] | ESP=c0103fa8  EBP=00000000  ESI=c0021354  EDI=00000000
-00423053476i[CPU0 ] | IOPL=0 id vip vif ac vm rf nt of df IF tf SF zf AF PF cf
-00423053476i[CPU0 ] | SEG selector     base    limit G D
-00423053476i[CPU0 ] | SEG sltr(index|ti|rpl)     base    limit G D
-00423053476i[CPU0 ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
-00423053476i[CPU0 ] | EIP=c0021386 (c0021386)
-00423053476i[CPU0 ] | CR0=0xe0010015 CR2=0x00000000
-00423053476i[CPU0 ] | CR3=0x00101000 CR4=0x00000000
-00423053476i[CPU0 ] 0xc0021386>> jmp .-14 (0xc002137a) : EBF2
-00423053476i[CMOS ] Last time is 423 (Wed Dec 31 18:07:03 1969)
-00423053476i[NGUI ] bx_nogui_gui_c::exit() not implemented yet.
-00423053476i[     ] restoring default signal behavior
-00423053476i[CTRL ] quit_sim called with exit code 1
+00311489300p[     ] >>PANIC<< SIGNAL 2 caught
+00311489300i[CPU0 ] CPU is in protected mode (halted)
+00311489300i[CPU0 ] CS.d_b = 32 bit
+00311489300i[CPU0 ] SS.d_b = 32 bit
+00311489300i[CPU0 ] | EAX=00000000  EBX=c0037bdc  ECX=c0103000  EDX=00000018
+00311489300i[CPU0 ] | ESP=c0103fa8  EBP=00000000  ESI=c00213b2  EDI=00000000
+00311489300i[CPU0 ] | IOPL=0 id vip vif ac vm rf nt of df IF tf SF zf AF PF cf
+00311489300i[CPU0 ] | SEG selector     base    limit G D
+00311489300i[CPU0 ] | SEG sltr(index|ti|rpl)     base    limit G D
+00311489300i[CPU0 ] |  CS:0008( 0001| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] |  DS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] |  SS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] |  ES:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] |  FS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] |  GS:0010( 0002| 0|  0) 00000000 ffffffff 1 1
+00311489300i[CPU0 ] | EIP=c00213e4 (c00213e4)
+00311489300i[CPU0 ] | CR0=0xe0010015 CR2=0x00000000
+00311489300i[CPU0 ] | CR3=0x00101000 CR4=0x00000000
+00311489300i[CPU0 ] 0xc00213e4>> jmp .-14 (0xc00213d8) : EBF2
+00311489300i[CMOS ] Last time is 311 (Wed Dec 31 19:05:11 1969)
+00311489300i[NGUI ] bx_nogui_gui_c::exit() not implemented yet.
+00311489300i[     ] restoring default signal behavior
+00311489300i[CTRL ] quit_sim called with exit code 1
