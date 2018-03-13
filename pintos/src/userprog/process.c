@@ -92,7 +92,8 @@ process_wait (tid_t child_tid UNUSED)
 {
  // debugging step to ensure where execution is goibng
  //for(;;);
- for(;;);
+
+for(;;);
   return -1;
 }
 
@@ -456,7 +457,7 @@ setup_stack (void **esp)
    stack_ptr = push_arg(stack_ptr, 0x00112233);
    stack_ptr = push_arg(stack_ptr, 0x00aabbcc);
    stack_ptr = push_arg(stack_ptr, 0x00445566);
-
+    *esp = stack_ptr;
    ASSERT(stack_ptr == (PHYS_BASE-12));
   return success;
 }
