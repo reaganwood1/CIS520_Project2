@@ -90,10 +90,9 @@ start_process (void *file_name_)
 int
 process_wait (tid_t child_tid UNUSED)
 {
- // debugging step to ensure where execution is goibng
- //for(;;);
-
+ // debugging step to ensure where execution is going
 for(;;);
+//timer_sleep(1000);
   return -1;
 }
 
@@ -429,7 +428,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
   return true;
 }
 
-uint32_t * push_arg(uint32_t * stack_ptr,uint32_t arg){
+uint32_t * pusha(uint32_t * stack_ptr,uint32_t arg){
       stack_ptr--;
      *stack_ptr = arg;
      return stack_ptr;
@@ -454,9 +453,9 @@ setup_stack (void **esp)
         palloc_free_page (kpage);
     }
    stack_ptr = *esp;
-   stack_ptr = push_arg(stack_ptr, 0x00112233);
-   stack_ptr = push_arg(stack_ptr, 0x00aabbcc);
-   stack_ptr = push_arg(stack_ptr, 0x00445566);
+   stack_ptr = pusha(stack_ptr, 0x00112233); // pointer to the argument
+   stack_ptr = pusha(stack_ptr, 0x5A5A5A5A); // argument count
+   stack_ptr = pusha(stack_ptr, 0x00445566); // nam eof the program
     *esp = stack_ptr;
    ASSERT(stack_ptr == (PHYS_BASE-12));
   return success;

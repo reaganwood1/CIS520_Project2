@@ -13,6 +13,13 @@ printf("%c",f->ebx);
 
 }
 
+void syscall0x00(void)
+{
+
+thread_exit();
+
+}// function to exit the current thread use echo.c ass a reference
+
 void
 syscall_init(void){
   intr_register_int (0x30,3,INTR_ON,syscall_handler,"syscall");
@@ -21,7 +28,15 @@ syscall_init(void){
 static void
 syscall_handler (struct intr_frame *f UNUSED)
 {
+  switch(f->eax){
+    case 0xff:
   syscall0xff(f);
-
-//  thread_exit ();
-}
+  break;
+    case 0x00:
+    syscall0x00();
+     break;
+  default:
+  printf("System Call!\n");
+  break;
+  }// end case for eax parameter
+}// end of syscall handler
