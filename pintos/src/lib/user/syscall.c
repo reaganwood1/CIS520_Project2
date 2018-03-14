@@ -120,7 +120,7 @@ read (int fd, void *buffer, unsigned size)
 {
   return syscall3 (SYS_READ, fd, buffer, size);
 }
-
+// sys write is actually 9 
 int
 write (int fd, const void *buffer, unsigned size)
 {

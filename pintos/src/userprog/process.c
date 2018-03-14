@@ -18,8 +18,10 @@
 #include "threads/thread.h"
 #include "threads/vaddr.h"
 
+#define INITIAL_USER_PAGE 0x08048000 - PGSIZE //specify the base of the page by subtracking th epage size
 static thread_func start_process NO_RETURN;
 static bool load (const char *cmdline, void (**eip) (void), void **esp);
+static bool install_page (void *upage, void *kpage, bool writable);
 
 /* Starts a new thread running a user program loaded from
    FILENAME.  The new thread may be scheduled (and may even exit)
@@ -67,6 +69,18 @@ start_process (void *file_name_)
   if (!success)
     thread_exit ();
 
+
+    uint8_t * kpage = palloc_get_page (PAL_USER | PAL_ZERO);
+    if (kpage != NULL)
+      {
+
+        if (!install_page ((uint8_t *)INITIAL_USER_PAGE, kpage, true)) {
+          palloc_free_page (file_name); // freeing ressource file name
+          palloc_free_page (kpage); // freeing resource kpage
+          thread_exit(); // if system cannot allocate a new exit then continue
+        }// end of free free page
+      }// end of kpage if not null
+
   /* Start the user process by simulating a return from an
      interrupt, implemented by intr_exit (in
      threads/intr-stubs.S).  Because intr_exit takes all of its
@@ -74,7 +88,6 @@ start_process (void *file_name_)
      we just point the stack pointer (%esp) to our stack frame
      and jump to it. */
   asm volatile ("movl %0, %%esp; jmp intr_exit" : : "g" (&if_) : "memory");
-  ASSERT(false);
   NOT_REACHED ();
 }
 
@@ -322,7 +335,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
 
 /* load() helpers. */
 
-static bool install_page (void *upage, void *kpage, bool writable);
+
 
 /* Checks whether PHDR describes a valid, loadable segment in
    FILE and returns true if so, false otherwise. */
