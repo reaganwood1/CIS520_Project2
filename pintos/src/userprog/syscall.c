@@ -6,19 +6,26 @@
 
 static void syscall_handler (struct intr_frame *);
 
-void syscall0xff(struct intr_frame *f)
+void syscall_SYS_WRITE(struct intr_frame *f)
 {
+void * esp = (uint32_t *)f->esp;
+uint32_t fd  = *(uint32_t *)(esp+4);
+char * buffer = (char *)*(uint32_t *)(esp+8);
+uint32_t size = *(uint32_t *)(esp+12);
+uint32_t char_cnt = 0;
 
-printf("%c",f->ebx);
+	while(size--) {
+		printf("%c", buffer[char_cnt++]);
+	}
 
 }
 
-void syscall0x00(void)
+void syscall_SYS_EXIT(void)
 {
 
 thread_exit();
 
-}// function to exit the current thread use echo.c ass a reference
+}// function to exit the current thread use echo.c as a reference
 
 void
 syscall_init(void){
@@ -27,19 +34,19 @@ syscall_init(void){
 
 static void
 syscall_handler (struct intr_frame *f UNUSED)
-{  uint32_t * esp = (uint32_t *)f-> esp;
-  printf("System call: <%d> file descripter: <%x> Pointer <%d> Size: <%d>!\n",*esp,*(esp+4),*(esp+8), *esp+12);
-/* switch(f->eax){
-    case 0xff:
-  syscall0xff(f);
-  break;
-    case 0x00:
-    syscall0x00();
-     break;
-  default:
-  printf("System Call!\n");
-  break;
-  }// end case for eax parameter
-  */
+{ 
+   uint32_t syscall_num = *(uint32_t *)f->esp;
+
+  switch(syscall_num) {
+	  case SYS_WRITE:
+	   syscall_SYS_WRITE(f);
+	   break;
+          
+	  case SYS_EXIT:
+                 syscall_SYS_EXIT();
+	  default:   
+            printf("System call: <%d>!\n",syscall_num);
+	    break;
+  }
 
 }// end of syscall handler

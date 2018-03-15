@@ -17,7 +17,7 @@
 #include "threads/palloc.h"
 #include "threads/thread.h"
 #include "threads/vaddr.h"
-
+#include "devices/timer.h"
 #define INITIAL_USER_PAGE 0x08048000 - PGSIZE //specify the base of the page by subtracking th epage size
 static thread_func start_process NO_RETURN;
 static bool load (const char *cmdline, void (**eip) (void), void **esp);
@@ -51,25 +51,27 @@ process_execute (const char *file_name)
 /* A thread function that loads a user process and starts it
    running. */
 static void
-start_process (void *file_name_)
+start_process (void * cmd_string)
 {
-  char *file_name = file_name_;
+  char file_name[15];
   struct intr_frame if_;
   bool success;
-
+  char * next_ptr;
+  char * next_token;
+    strlcpy(file_name,cmd_string,strcspn(cmd_string,"\t"));
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
   success = load (file_name, &if_.eip, &if_.esp);
-
   /* If load failed, quit. */
-  palloc_free_page (file_name);
-  if (!success)
+
+  //palloc_free_page (file_name);
+  if (!success){
     thread_exit ();
-
-
+  	}
+   
     uint8_t * kpage = palloc_get_page (PAL_USER | PAL_ZERO);
     if (kpage != NULL)
       {
@@ -78,8 +80,41 @@ start_process (void *file_name_)
           palloc_free_page (file_name); // freeing ressource file name
           palloc_free_page (kpage); // freeing resource kpage
           thread_exit(); // if system cannot allocate a new exit then continue
-        }// end of free free page
+        }// end of free free pag
+
       }// end of kpage if not null
+int argc; // number of arguments count
+char ** argv;
+
+if_.esp  = if_.esp - 128 * 4;  // reserve space in the stack to palce argument pointers
+// argument to point to first of the pointers
+argv = if_.esp; // make sure the argument vector points to argument
+
+strlcpy((char*)INITIAL_USER_PAGE,cmd_string,strlen(cmd_string));
+
+
+// Parse the next command string to retrieve name
+next_token = strtok_r((char *) INITIAL_USER_PAGE," \t",&next_ptr);
+
+argv[0] =  next_token;
+while(argc++) {
+next_token = strtok_r(NULL," \t", &next_ptr);
+    if(next_token == NULL){
+      break;
+      argv[argc++] = next_token;
+    }
+
+}
+pusha(&if_.esp,(uint32_t)argv);
+pusha(&if_.esp,(uint32_t)argc);
+pusha(&if_.esp,(uint32_t)&argv[0]);
+//while()
+
+   palloc_free_page (cmd_string);
+   if(!success){
+     thread_exit();
+   }// end if not success
+
 
   /* Start the user process by simulating a return from an
      interrupt, implemented by intr_exit (in
@@ -104,8 +139,8 @@ int
 process_wait (tid_t child_tid UNUSED)
 {
  // debugging step to ensure where execution is going
-for(;;);
-//timer_sleep(1000);
+
+timer_sleep(1000);
   return -1;
 }
 
@@ -331,6 +366,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
   /* We arrive here whether the load is successful or not. */
   file_close (file);
   return success;
+ 
 }
 
 /* load() helpers. */
@@ -441,10 +477,12 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
   return true;
 }
 
-uint32_t * pusha(uint32_t * stack_ptr,uint32_t arg){
-      stack_ptr--;
-     *stack_ptr = arg;
-     return stack_ptr;
+
+// put about function in here
+
+void pusha(void ** esp,uint32_t arg){
+      *esp = *esp-4;// stack pointer is decremented by 4 bytes when argument is pushe dinto a stack
+     *(uint32_t * )*esp = arg;
 }
 
 
@@ -465,12 +503,12 @@ setup_stack (void **esp)
       else
         palloc_free_page (kpage);
     }
-   stack_ptr = *esp;
-   stack_ptr = pusha(stack_ptr, 0x00112233); // pointer to the argument
-   stack_ptr = pusha(stack_ptr, 0x5A5A5A5A); // argument count
-   stack_ptr = pusha(stack_ptr, 0x00445566); // nam eof the program
-    *esp = stack_ptr;
-   ASSERT(stack_ptr == (PHYS_BASE-12));
+//   stack_ptr = *esp;
+//   stack_ptr = pusha(stack_ptr, 0x00112233); // pointer to the argument
+//   stack_ptr = pusha(stack_ptr, 0x5A5A5A5A); // argument count
+  // stack_ptr = pusha(stack_ptr, 0x00445566); // nam eof the program
+  //  *esp = stack_ptr;
+//   ASSERT(stack_ptr == (PHYS_BASE-12));
   return success;
 }
 

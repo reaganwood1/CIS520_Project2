@@ -6,8 +6,9 @@ int
 main (int argc, char **argv)
 {
   int i;
-printf("hello world!");
-for(;;);
+printf("arg <%d>\n", argc);
+printf("argv[0] <%s>\n", argv[0]);
+
 /*
   for (i = 0; i < argc; i++)
   // this is the user space printf
