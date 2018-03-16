@@ -23,6 +23,8 @@ static thread_func start_process NO_RETURN;
 static bool load (const char *cmdline, void (**eip) (void), void **esp);
 static bool install_page (void *upage, void *kpage, bool writable);
 
+char process_name[15];
+
 /* Starts a new thread running a user program loaded from
    FILENAME.  The new thread may be scheduled (and may even exit)
    before process_execute() returns.  Returns the new process's
@@ -60,7 +62,6 @@ start_process (void * cmd_string)
   char * next_token;
   
   strlcpy(file_name,cmd_string,strcspn(cmd_string," \t")+1);
-  printf("file_name is <%s>!\n", file_name);
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
@@ -151,7 +152,8 @@ process_wait (tid_t child_tid UNUSED)
 //thread_block();
 
 timer_sleep(1000);
-  return -1;
+printf("%s: exit(%d)\n", process_name, 0);
+return 0;
 }
 
 /* Free the current process's resources. */
@@ -284,6 +286,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
     goto done;
   process_activate ();
   /* open exec;utable file. */
+  strlcpy(process_name, file_name, strlen(file_name)+1);
   file = filesys_open (file_name);
   if (file == NULL)
     {

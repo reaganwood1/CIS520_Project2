@@ -5,6 +5,9 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "userprog/pagedir.h"
+#include "filesys/file.h"
+#include "filesys/filesys.h"
+
 /***  	EVERYWHERE "ERROR" IS WRITTEN IN RYANTIMWILSON PASS IN -1 SAME WITH CLOSE_ALL 
 REMOVE THIS COMMENT BEFORE SUBMISSION*/
 #define MAX_ARGS 3
@@ -66,6 +69,9 @@ syscall_handler (struct intr_frame *f UNUSED)
 	  case SYS_REMOVE:
 		break;
 	  case SYS_OPEN:
+		/*get_stack_arguments(f, &arguments[0], 1);
+		arguments[0] = user_to_kernel_pointer((const void *) arguments[0]);
+		f->eax = open((const char *) arguments[0]);*/
 		break;
 	  case SYS_FILESIZE:
 		break;
@@ -119,3 +125,40 @@ bool removeFile (const char *file)
   lock_release(&filesystem_lock);
   return was_file_removed;
 }
+
+/* Inspiration from Ryantimwilson Repo */
+int user_to_kernel_pointer(const void *validAddress)
+{
+  check_valid_addr(validAddress);
+  void *pointer = pagedir_get_page(thread_current()->pagedir, validAddress);
+  if (!pointer) {
+      syscall_SYS_EXIT(-1);
+  }
+  return (int) pointer;
+}
+
+/* Inspiration from RyanTWilson Repo 
+int open (const char *file)
+{
+  lock_acquire(&filesystem_lock);
+  struct file *f = filesys_open(file);
+  if (!f)
+    {
+      lock_release(&filesystem_lock);
+      return -1;
+    }
+  int fd = process_add_file(f);
+  lock_release(&filesystem_lock);
+  return fd;
+}
+
+int process_add_file (struct file *f)
+{
+  struct process_file *pf = malloc(sizeof(struct process_file));
+  pf->file = f;
+  pf->fd = thread_current()->fd;
+  thread_current()->fd++;
+  list_push_back(&thread_current()->file_list, &pf->elem);
+  return pf->fd;
+}
+*/
