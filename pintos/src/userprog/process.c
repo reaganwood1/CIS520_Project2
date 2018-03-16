@@ -83,31 +83,34 @@ start_process (void * cmd_string)
         }// end of free free pag
 
       }// end of kpage if not null
-int argc; // number of arguments count
+int argc = 0; // number of arguments count
 char ** argv;
 
 if_.esp  = if_.esp - 128 * 4;  // reserve space in the stack to palce argument pointers
 // argument to point to first of the pointers
 argv = if_.esp; // make sure the argument vector points to argument
 
-strlcpy((char*)INITIAL_USER_PAGE,cmd_string,strlen(cmd_string));
-
+strlcpy((char*)INITIAL_USER_PAGE,cmd_string,strlen(cmd_string)+1);
+//printf("String at INITIAL_USER_PAGE: <%s>", (char *)INITIAL_USER_PAGE);
 
 // Parse the next command string to retrieve name
 next_token = strtok_r((char *) INITIAL_USER_PAGE," \t",&next_ptr);
 
 argv[0] =  next_token;
-while(argc++) {
+while(++argc) {
 next_token = strtok_r(NULL," \t", &next_ptr);
     if(next_token == NULL){
       break;
-      argv[argc++] = next_token;
+      argv[argc] = next_token;
     }
 
 }
+printf("Argument count: <%d>!\n", argc);
 pusha(&if_.esp,(uint32_t)argv);
 pusha(&if_.esp,(uint32_t)argc);
 pusha(&if_.esp,(uint32_t)&argv[0]);
+
+printf("argument last value <%s>\n",argv[0]);
 //while()
 
    palloc_free_page (cmd_string);
