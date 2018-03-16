@@ -8,8 +8,8 @@ main (int argc, char **argv)
 	
   int i;
   /*
-printf("arg <%d>\n", argc);
-printf("argv[0] <%s>\n", argv[0]);
+//printf("arg <%d>\n", argc);
+//printf("argv[0] <%s>\n", argv[0]);
 */
 
   for (i = 0; i < argc; i++)

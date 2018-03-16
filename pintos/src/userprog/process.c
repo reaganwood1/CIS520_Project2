@@ -99,11 +99,9 @@ next_token = strtok_r((char *) INITIAL_USER_PAGE," \t",&next_ptr);
 argv[0] =  next_token;
 while(++argc) {
 next_token = strtok_r(NULL," \t", &next_ptr);
-    if(next_token == NULL){
+    if(next_token == NULL)
       break;
-      argv[argc] = next_token;
-    }
-
+    argv[argc] = next_token;
 }
 printf("Argument count: <%d>!\n", argc);
 pusha(&if_.esp,(uint32_t)argv);
