@@ -2,7 +2,7 @@
 clear
 clear
 echo entering directory /examples ...
-cd /examples/
+cd ../examples/
 make
 
 echo Entering directory /userprog ...
@@ -15,5 +15,5 @@ echo Entering directory /userprog/build ...
 cd build
 pintos-mkdisk filesys.dsk --filesys-size=2;
 pintos -f -q;
-pintos -p ../src/userprog/build/tests/userprog/args-none -a args-none -- -q;
+pintos -p /build/tests/userprog/args-none -a args-none -- -q;
 pintos -q run 'args-none' ;

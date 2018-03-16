@@ -58,7 +58,9 @@ start_process (void * cmd_string)
   bool success;
   char * next_ptr;
   char * next_token;
-    strlcpy(file_name,cmd_string,strcspn(cmd_string,"\t"));
+  
+  strlcpy(file_name,cmd_string,strcspn(cmd_string," \t")+1);
+  printf("file_name is <%s>!\n", file_name);
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
   if_.gs = if_.fs = if_.es = if_.ds = if_.ss = SEL_UDSEG;
@@ -275,8 +277,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
   off_t file_ofs;
   bool success = false;
   int i;
-  char *f ="echo";
-  file_name = f;
+  
   /* Allocate and activate page directory. */
   t->pagedir = pagedir_create ();
   if (t->pagedir == NULL)
