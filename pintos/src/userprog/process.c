@@ -103,12 +103,10 @@ next_token = strtok_r(NULL," \t", &next_ptr);
       break;
     argv[argc] = next_token;
 }
-printf("Argument count: <%d>!\n", argc);
 pusha(&if_.esp,(uint32_t)argv);
 pusha(&if_.esp,(uint32_t)argc);
 pusha(&if_.esp,(uint32_t)&argv[0]);
 
-printf("argument last value <%s>\n",argv[0]);
 //while()
 
    palloc_free_page (cmd_string);
@@ -140,6 +138,15 @@ int
 process_wait (tid_t child_tid UNUSED)
 {
  // debugging step to ensure where execution is going
+//struct thread * add; //
+//add = thread_list[child_tid];
+
+
+// in our thead file add a waiter list 
+// // push current thread list element onto waiter list in name 
+//  then call  thread_block on the  current thread
+// return  exit status of a child  
+//thread_block();
 
 timer_sleep(1000);
   return -1;

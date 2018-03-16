@@ -15,6 +15,5 @@ echo Entering directory /userprog/build ...
 cd build
 pintos-mkdisk filesys.dsk --filesys-size=2;
 pintos -f -q;
-pintos -p ../examples/echo -a echo -- -q;
-pintos -q run 'echo x' ;
-pintos -q run "echo This is the userspace!";
+pintos -p ../src/userprog/build/tests/userprog/args-none -a args-none -- -q;
+pintos -q run 'args-none' ;
