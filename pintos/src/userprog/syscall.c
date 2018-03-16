@@ -1,8 +1,14 @@
 #include "userprog/syscall.h"
 #include <stdio.h>
+#include "threads/vaddr.h"
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
+#include "userprog/pagedir.h"
+/***  	EVERYWHERE "ERROR" IS WRITTEN IN RYANTIMWILSON PASS IN -1 SAME WITH CLOSE_ALL 
+REMOVE THIS COMMENT BEFORE SUBMISSION*/
+#define MAX_ARGS 3
+#define USER_VADDR_BOTTOM ((void *) 0x08048000)
 
 static void syscall_handler (struct intr_frame *);
 
@@ -20,11 +26,11 @@ uint32_t char_cnt = 0;
 
 }
 
-void syscall_SYS_EXIT(void)
+struct lock filesystem_lock;
+
+void syscall_SYS_EXIT(int kernelStatus)
 {
-
 thread_exit();
-
 }// function to exit the current thread use echo.c as a reference
 
 void
@@ -36,17 +42,80 @@ static void
 syscall_handler (struct intr_frame *f UNUSED)
 { 
    uint32_t syscall_num = *(uint32_t *)f->esp;
-
-  switch(syscall_num) {
+	int arguments[3];
+	/* Stores the physical page pointer. */
+    void * physical_page_pointer;
+	
+  switch(syscall_num) {//exec
 	  case SYS_WRITE:
 	   syscall_SYS_WRITE(f);
 	   break;
           
 	  case SYS_EXIT:
-                 syscall_SYS_EXIT();
+                 syscall_SYS_EXIT(arguments[0]);
+				 break;
+	  case SYS_HALT:
+		systemHalt();
+		break;
+	  case SYS_WAIT: 
+	  get_stack_arguments(f, &arguments[0], 1);
+	  f->eax = process_wait(arguments[0]);
+		break;
+	  case SYS_CREATE:
+		break;
+	  case SYS_REMOVE:
+		break;
+	  case SYS_OPEN:
+		break;
+	  case SYS_FILESIZE:
+		break;
+      case SYS_READ:
+		break;
+	  case SYS_SEEK:
+		break;
+	  case SYS_TELL:
+		break;
+	  case SYS_CLOSE:
+		break;
 	  default:   
             printf("System call: <%d>!\n",syscall_num);
 	    break;
   }
 
 }// end of syscall handler
+
+void systemHalt (void) {
+	shutdown_power_off();
+}
+
+/* This code is copied from Ryantimwilson repository that is linked the Design2.txt. It gets the arguments for the frame and sets them to the 3 positions in
+in args array. */
+void get_stack_arguments (struct intr_frame *f, int *args, int num_of_args)
+{
+  int i;
+  int *ptr;
+  for (i = 0; i < num_of_args; i++)
+    {
+      ptr = (int *) f->esp + i + 1;
+      check_valid_addr((const void *) ptr);
+      args[i] = *ptr;
+    }
+}
+
+//checks to make sure the passed in pointer is valid
+void check_valid_addr(const void *vaddr)
+{
+		if(!is_user_vaddr(vaddr) || vaddr < USER_VADDR_BOTTOM)
+		{
+			syscall_SYS_EXIT(-1);
+		}
+}
+/* Remove the file from the file system, and return a boolean indicating
+   the success of the operation. */
+bool removeFile (const char *file)
+{
+  lock_acquire(&filesystem_lock);
+  bool was_file_removed = filesys_remove(file);
+  lock_release(&filesystem_lock);
+  return was_file_removed;
+}
