@@ -42,7 +42,7 @@ struct process_file {
 void syscall_SYS_EXIT(int kernelStatus)
 {
 	struct thread *current = thread_current();
-	 printf ("%s: exit(%d)\n", current->name, kernelStatus);
+	printf ("%s: exit(%d)\n", current->name, kernelStatus);
 	thread_exit();
 }// function to exit the current thread use echo.c as a reference
 

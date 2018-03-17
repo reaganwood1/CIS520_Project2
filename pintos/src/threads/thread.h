@@ -111,9 +111,13 @@ struct thread
 #endif
 
     /* Owned by thread.c. */
-    unsigned magic;                     /* Detects stack overflow */ 
+    unsigned magic; /* Detects stack overflow */ 
+
+    /* Inspiration Ryan TWilson repository, neded to keep track of files a thread has open */
+    struct list file_list;
+    int file_descriptor; /* file descriptor describes how the file was opened */
   };
-  
+ 
 #endif
 
 /* If false (default), use round-robin scheduler.
