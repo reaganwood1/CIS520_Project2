@@ -152,7 +152,7 @@ process_wait (tid_t child_tid UNUSED)
 //thread_block();
 
 timer_sleep(1000);
-printf("%s: exit(%d)\n", process_name, 0);
+//printf("%s: exit(%d)\n", process_name, 0);
 return 0;
 }
 

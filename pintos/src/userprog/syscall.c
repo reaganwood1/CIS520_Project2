@@ -14,6 +14,7 @@ REMOVE THIS COMMENT BEFORE SUBMISSION*/
 #define USER_VADDR_BOTTOM ((void *) 0x08048000)
 
 static void syscall_handler (struct intr_frame *);
+bool create (const char * file, unsigned initial_size);
 
 void syscall_SYS_WRITE(struct intr_frame *f)
 {
@@ -31,9 +32,18 @@ uint32_t char_cnt = 0;
 
 struct lock filesystem_lock;
 
+/* Inspiration from RyantTWilson repository  */
+struct process_file {
+	  struct file *file;
+	    int file_descriptor;
+	      struct list_elem elem;
+};
+
 void syscall_SYS_EXIT(int kernelStatus)
 {
-thread_exit();
+	struct thread *current = thread_current();
+	 printf ("%s: exit(%d)\n", current->name, kernelStatus);
+	thread_exit();
 }// function to exit the current thread use echo.c as a reference
 
 void
@@ -55,6 +65,7 @@ syscall_handler (struct intr_frame *f UNUSED)
 	   break;
           
 	  case SYS_EXIT:
+		get_stack_arguments(f, &arguments[0], 1);
                  syscall_SYS_EXIT(arguments[0]);
 				 break;
 	  case SYS_HALT:
@@ -65,13 +76,16 @@ syscall_handler (struct intr_frame *f UNUSED)
 	  f->eax = process_wait(arguments[0]);
 		break;
 	  case SYS_CREATE:
+		get_stack_arguments(f, &arguments[0], 1);
+		arguments[0] = user_to_kernel_pointer((const void *) arguments[0]);
+		f->eax = create((const char *) arguments[0], (unsigned) arguments[1]);
 		break;
 	  case SYS_REMOVE:
 		break;
 	  case SYS_OPEN:
-		/*get_stack_arguments(f, &arguments[0], 1);
+		get_stack_arguments(f, &arguments[0], 1);
 		arguments[0] = user_to_kernel_pointer((const void *) arguments[0]);
-		f->eax = open((const char *) arguments[0]);*/
+		f->eax = open((const char *) arguments[0]);
 		break;
 	  case SYS_FILESIZE:
 		break;
@@ -137,7 +151,7 @@ int user_to_kernel_pointer(const void *validAddress)
   return (int) pointer;
 }
 
-/* Inspiration from RyanTWilson Repo 
+/* Inspiration from RyanTWilson Repo */
 int open (const char *file)
 {
   lock_acquire(&filesystem_lock);
@@ -147,18 +161,25 @@ int open (const char *file)
       lock_release(&filesystem_lock);
       return -1;
     }
-  int fd = process_add_file(f);
+  int fileDescriptor = process_add_file(f);
   lock_release(&filesystem_lock);
-  return fd;
+  return fileDescriptor;
 }
 
+/* Inspiration from RyanTWilson Repo */
 int process_add_file (struct file *f)
 {
   struct process_file *pf = malloc(sizeof(struct process_file));
   pf->file = f;
-  pf->fd = thread_current()->fd;
-  thread_current()->fd++;
+  pf->file_descriptor = thread_current()->file_descriptor;
+  thread_current()->file_descriptor++;
   list_push_back(&thread_current()->file_list, &pf->elem);
-  return pf->fd;
+  return pf->file_descriptor;
 }
-*/
+
+bool create (const char * file, unsigned initial_size) {
+	lock_acquire(&filesystem_lock);
+	bool success = filesys_create(file, initial_size);
+	lock_release(&filesystem_lock);
+	return success;
+}
