@@ -15,6 +15,7 @@ REMOVE THIS COMMENT BEFORE SUBMISSION*/
 
 static void syscall_handler (struct intr_frame *);
 bool create (const char * file, unsigned initial_size);
+struct file* process_get_file (int fd);
 
 void syscall_SYS_WRITE(struct intr_frame *f)
 {
@@ -61,7 +62,10 @@ syscall_handler (struct intr_frame *f UNUSED)
 	
   switch(syscall_num) {//exec
 	  case SYS_WRITE:
-	   syscall_SYS_WRITE(f);
+		get_stack_arguments(f, &arguments[0], 3);
+		check_valid_buffer((void *) arguments[1], (unsigned) arguments[2]);
+		arguments[1] = user_to_kernel_pointer((const void *) arguments[1]);
+		f->eax = write(arguments[0], (const void *) arguments[1], (unsigned) arguments[2]);
 	   break;
           
 	  case SYS_EXIT:
@@ -182,4 +186,53 @@ bool create (const char * file, unsigned initial_size) {
 	bool success = filesys_create(file, initial_size);
 	lock_release(&filesystem_lock);
 	return success;
+}
+
+/* Inspiration from RyantTWilson */
+int write (int fd, const void *buffer, unsigned size) {
+	if (fd == STDOUT_FILENO)
+    {
+      putbuf(buffer, size);
+      return size;
+    }
+  lock_acquire(&filesystem_lock);
+  struct file *f = process_get_file(fd);
+  if (!f)
+    {
+      lock_release(&filesystem_lock);
+      return -1;
+    }
+  int bytes = file_write(f, buffer, size);
+  lock_release(&filesystem_lock);
+  return bytes;
+}
+
+/* Inspiration from RyanTWilson */
+void check_valid_buffer (void* buffer, unsigned size)
+{
+  unsigned i;
+  char* local_buffer = (char *) buffer;
+  for (i = 0; i < size; i++)
+    {
+      check_valid_addr((const void*) local_buffer);
+      local_buffer++;
+    }
+}
+
+/* Inspiration from RyanTWilson repo */
+struct file* process_get_file (int fd)
+{
+  struct thread *t = thread_current();
+  struct list_elem *e;
+
+  for (e = list_begin (&t->file_list); e != list_end (&t->file_list);
+       e = list_next (e))
+        {
+          struct process_file *pf = list_entry (e, struct process_file, elem);
+          if (fd == pf->file_descriptor)
+	    {
+	      return pf->file;
+	    }
+        }
+  return NULL;
 }
