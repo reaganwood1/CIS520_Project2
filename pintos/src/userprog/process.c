@@ -42,6 +42,10 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
+  // Get parsed file name, RyanTWilson repo inspiration
+  char *save_ptr;
+  file_name = strtok_r((char *) file_name, " ", &save_ptr); // ends file name at space
+  
   /* Create a new thread to execute FILE_NAME. */
   // running user space program as a thread
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
